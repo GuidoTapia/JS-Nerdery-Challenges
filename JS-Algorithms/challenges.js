@@ -14,6 +14,15 @@ Invoking "readableTime(3690)" should return "01:01:30" (HH:MM:SS)
 
 const readableTime = (seconds) => {
 	// YOUR CODE HERE...
+	const hour=['','',''];
+	for(let i=0;i<3;++i){
+		hour[i]=(seconds%60).toString();
+		seconds=Math.floor(seconds/60);
+		if(hour[i].length==1){
+			hour[i]='0'+hour[i];
+		}
+	}
+	return `${hour[2]}:${hour[1]}:${hour[0]}`;
 };
 
 readableTime(458);
@@ -42,6 +51,10 @@ const COUNTRY_NAMES = ['Germany', 'Norway', 'Island', 'Japan', 'Israel'];
 
 const circularArray = (index) => {
 	// YOUR CODE HERE...
+	const realIndex = index%COUNTRY_NAMES.length;
+	const NEW_COUNTRY_NAMES = COUNTRY_NAMES.slice(realIndex);
+	Array.prototype.push.apply(NEW_COUNTRY_NAMES,COUNTRY_NAMES.slice(0,realIndex));
+	return NEW_COUNTRY_NAMES;
 };
 
 circularArray(2);
@@ -71,6 +84,56 @@ The last 3 digits for the sum of powers from 1 to 10 is "317"
 
 const ownPower = (number, lastDigits) => {
 	// YOUR CODE HERE...
+	/* this challenge was posible using just */
+	const sumAcumulator={
+		numberString:'0',
+		addString: function(x){
+			let carry=0;
+			let aux='';
+			if(x.length>this.numberString.length){
+				[x,this.numberString]=[this.numberString,x];
+			}
+			for(let i=0;i<x.length;++i){
+				carry=parseInt(x[i])+parseInt(this.numberString[i])+carry;
+				aux+=(carry%10).toString();
+				carry=Math.floor(carry/10);
+			}
+			for(let i=x.length;i<this.numberString.length;++i){
+				carry=parseInt(this.numberString[i])+carry;
+				aux+=(carry%10).toString();
+				carry=Math.floor(carry/10);
+			}
+			if(carry){
+				aux+=carry.toString().toString().split("").reverse().join("");
+			}
+			this.numberString=aux;
+		},
+	};
+	for(let i=number;i;--i){
+		const iPowerToI={
+			numberString:'1',
+			powerString: function(x,e){
+				numberString=x.toString().split("").reverse().join("");
+				for(;e;e--){
+					let carry=0;
+					let aux='';
+					for(let i=0;i<this.numberString.length;++i){
+						carry=x*parseInt(this.numberString[i])+carry;
+						aux+=(carry%10).toString();
+						carry=Math.floor(carry/10);
+					}
+					if(carry){
+						aux+=carry.toString().split("").reverse().join("");
+					}
+					this.numberString=aux;
+				}     
+			},
+		};
+		/* algorithm*/
+		iPowerToI.powerString(i,i);
+		sumAcumulator.addString(iPowerToI.numberString);
+	}
+	return sumAcumulator.numberString.split("").reverse().slice(-lastDigits).join("");
 };
 
 ownPower(10, 3);
@@ -96,6 +159,27 @@ Since 10! === 3628800 and you sum 3 + 6 + 2 + 8 + 8 + 0 + 0
 
 const digitSum = (n) => {
 	// YOUR CODE HERE...
+	const fiboAcumulator={
+		numberString:'1',
+		multiplication: function(x){
+			let carry=0;
+			let aux='';
+			for(let i=0;i<this.numberString.length;++i){
+				carry=x*parseInt(this.numberString[i])+carry;
+				aux+=(carry%10).toString();
+				carry=Math.floor(carry/10);
+			}
+			if(carry){
+				aux+=carry.toString().split("").reverse().join("");
+			}
+			this.numberString=aux;     
+		},
+	};
+	for (let i = n; i; --i) {
+		fiboAcumulator.multiplication(i);
+	}
+	return fiboAcumulator.numberString
+		.split('').reduce((total, num) => parseFloat(total) + parseFloat(num));
 };
 
 digitSum(10);
@@ -119,6 +203,36 @@ Because the 12th index in the Fibonacci sequence is 144, and 144 has three digit
 
 const fibIndex = (n) => {
 	// YOUR CODE HERE...
+	let previous='0';
+	const sumAcumulator={
+		numberString:'1',
+		addString: function(x){
+			let carry=0;
+			let aux='';
+			for(let i=0;i<x.length;++i){
+				carry=parseInt(x[i])+parseInt(this.numberString[i])+carry;
+				aux+=(carry%10).toString();
+				carry=Math.floor(carry/10);
+			}
+			for(let i=x.length;i<this.numberString.length;++i){
+				carry=parseInt(this.numberString[i])+carry;
+				aux+=(carry%10).toString();
+				carry=Math.floor(carry/10);
+			}
+			if(carry){
+				aux+=carry.toString().toString().split("").reverse().join("");
+			}
+			this.numberString=aux;
+		},
+	};
+	let i=1;
+	while(sumAcumulator.numberString.length <n){
+		let aux=previous;
+		previous=sumAcumulator.numberString;
+		sumAcumulator.addString(aux);
+		++i;
+	}
+	return i;
 };
 
 fibIndex(3);
